@@ -6,9 +6,9 @@
 :root{--bg:#f4f5f7;--card:#fff;--tx:#1a1d21;--mu:#6b7280;--bd:#e3e6ea;--ac:#0f766e;--g:#16a34a;--a:#f59e0b;--r:#dc2626;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111418;--card:#1b2026;--tx:#eceff2;--mu:#9aa3ad;--bd:#2c333b;--ac:#2dd4bf;color-scheme:dark}}
 :root[data-theme="dark"]{--bg:#111418;--card:#1b2026;--tx:#eceff2;--mu:#9aa3ad;--bd:#2c333b;--ac:#2dd4bf;color-scheme:dark}
-*{box-sizing:border-box}html,body{margin:0}
-body{background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding-bottom:76px}
-main{max-width:760px;margin:0 auto;padding:14px}
+*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;flex-direction:column}
+#sc{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}main{max-width:760px;margin:0 auto;padding:14px}
 h1{font-size:18px;margin:0}h2{font-size:15px;margin:18px 0 8px;color:var(--mu);text-transform:uppercase;letter-spacing:.04em}
 .top{display:flex;justify-content:space-between;align-items:center;padding:4px 0 10px}
 .card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px}
@@ -26,7 +26,7 @@ button.p{background:var(--ac);color:#fff;border-color:var(--ac)}button.d{color:v
 .st{display:flex;gap:5px}.st button{width:34px;height:34px;padding:0;border-radius:50%;opacity:.35;border-width:2px}
 .st button.on{opacity:1;color:#fff}.st .g{border-color:var(--g)}.st .g.on{background:var(--g)}.st .a{border-color:var(--a)}.st .a.on{background:var(--a)}.st .r{border-color:var(--r)}.st .r.on{background:var(--r)}
 .it input.n{margin-top:6px;padding:6px 9px;font-size:13px}
-nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--bd);display:flex;padding-bottom:env(safe-area-inset-bottom,0px);z-index:5}
+nav{flex:none;background:var(--card);border-top:1px solid var(--bd);display:flex;z-index:5}
 nav button{flex:1;border:0;border-radius:0;background:none;padding:10px 2px;font-size:11px;color:var(--mu)}nav button.on{color:var(--ac);font-weight:700}nav span{display:block;font-size:19px}
 .th{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.th img{width:84px;height:84px;object-fit:cover;border-radius:10px;border:1px solid var(--bd);cursor:pointer}
 .th div{position:relative}.th b{position:absolute;top:2px;right:2px;background:#000a;color:#fff;border-radius:50%;width:20px;height:20px;text-align:center;font-size:12px;line-height:20px;cursor:pointer}
@@ -38,7 +38,7 @@ details{border:1px solid var(--bd);border-radius:10px;padding:8px 10px;margin-to
 input[type=date]{-webkit-appearance:none;appearance:none;min-height:42px}
 .tb{width:100%;border-collapse:collapse;font-size:14px}.tb th{text-align:left;color:var(--mu);font-size:12px;padding:10px 8px;border-bottom:1px solid var(--bd)}.tb td{padding:9px 8px;border-bottom:1px solid var(--bd);vertical-align:middle}.tb .n{text-align:right}.tb button{padding:6px 8px;font-size:15px;margin-left:3px}.tb button:disabled{opacity:.35}
 </style></head><body>
-<main><div class="top"><h1>🚗 PMS Tracker</h1><span class="mu" id="hd"></span></div><div id="app"></div></main>
+<div id="sc"><main><div class="top"><h1>🚗 PMS Tracker</h1><span class="mu" id="hd"></span></div><div id="app"></div></main></div>
 <nav id="nav"></nav><div id="ov" onclick="this.style.display='none'"><button>Close ✕</button><img id="ovi"><div id="ovm"></div></div>
 <script>
 const $=s=>document.querySelector(s);
@@ -127,7 +127,7 @@ function syncDr(){const g=(i,d)=>{const e=$("#"+i);return e?e.value:d};dr.odo=g(
 async function addDraft(files,w){syncDr();for(const f of files){const k=uid();await idb("put",k,await shrink(f));(w==="r"?dr.rimgs:dr.imgs).push(k)}render()}
 async function delDraft(k){syncDr();dr.imgs=dr.imgs.filter(x=>x!==k);dr.rimgs=dr.rimgs.filter(x=>x!==k);await idb("del",k);render()}
 function savePms(){syncDr();if(!dr.imgs.length&&!dr.rimgs.length&&!(+dr.cost>0))return alert("Upload the inspection sheet photo and/or enter the total cost first.");
-const r=mkInsp(today(),+dr.odo||0);r.imgs=dr.imgs;r.notes=dr.note;const s=mkSvc(r);s.imgs=dr.rimgs;s.lines=[{d:"PMS total cost",amt:+dr.cost||0}];S.insp.unshift(r);S.svc.unshift(s);dr={odo:"",cost:"",note:"",imgs:[],rimgs:[]};nb=true;save();render();scrollTo(0,0)}
+const r=mkInsp(today(),+dr.odo||0);r.imgs=dr.imgs;r.notes=dr.note;const s=mkSvc(r);s.imgs=dr.rimgs;s.lines=[{d:"PMS total cost",amt:+dr.cost||0}];S.insp.unshift(r);S.svc.unshift(s);dr={odo:"",cost:"",note:"",imgs:[],rimgs:[]};nb=true;save();render();$('#sc').scrollTo(0,0)}
 function setCost(id,v){let s=S.svc.find(x=>x.iid===id);if(!s){s=mkSvc(rec("insp",id));S.svc.unshift(s)}s.lines=[{d:"PMS total cost",amt:+v||0}];save();render()}
 let ed=null;
 const pz=n=>"₱"+(+n||0).toLocaleString("en-PH",{maximumFractionDigits:2});
@@ -197,7 +197,7 @@ SCH.forEach(([id,name,ops])=>(cd[id]||ops).forEach(op=>{const rf=done(id,op.t===
 const dt=mo?addM(rf?rf.date:pD,mo):null,st=(c<=pO||(dt&&dt<=today()))?0:(c<=s.nextOdo||(dt&&dt<=(s.dueDate||"9999")))?1:2;rows.push({name,t:op.t,c,dt,st,rf})}));
 return{s,rows:rows.filter(x=>!(x.t==="I"&&rows.some(y=>y.name===x.name&&y.t==="R"&&y.c<=x.c))).sort((a,b)=>a.st-b.st||a.c-b.c)}}
 function replCard(){const r=sched().rows.filter(x=>x.t==="R"),a=r.filter(x=>x.st===0).length,b=r.filter(x=>x.st===1).length,n=a+b,cls=a?"ov":n?"wa":"ok";
-return`<button class="al ${cls}" style="width:100%;text-align:left;border:0;display:block;cursor:pointer;font:inherit" onclick="tab='sch';sf='R';render();scrollTo(0,0)"><div class="row sp"><span style="font-weight:600">🔔 Items to replace</span><span style="font-size:26px;font-weight:700;line-height:1">${n}</span></div><div style="font-weight:400;font-size:13px;margin-top:6px">${n?r.filter(x=>x.st<2).map(x=>"• "+x.name).join("<br>"):"Nothing due by the next PMS"}</div><div style="font-weight:400;font-size:12px;margin-top:4px;opacity:.9">${a} overdue · ${b} due by next PMS · ${r.length-n} later in schedule · tap to view ›</div></button>`}
+return`<button class="al ${cls}" style="width:100%;text-align:left;border:0;display:block;cursor:pointer;font:inherit" onclick="tab='sch';sf='R';render();$('#sc').scrollTo(0,0)"><div class="row sp"><span style="font-weight:600">🔔 Items to replace</span><span style="font-size:26px;font-weight:700;line-height:1">${n}</span></div><div style="font-weight:400;font-size:13px;margin-top:6px">${n?r.filter(x=>x.st<2).map(x=>"• "+x.name).join("<br>"):"Nothing due by the next PMS"}</div><div style="font-weight:400;font-size:12px;margin-top:4px;opacity:.9">${a} overdue · ${b} due by next PMS · ${r.length-n} later in schedule · tap to view ›</div></button>`}
 function cdCard(){const s=status();if(!s.last||!s.dueDate)return"";
 const end=new Date(s.dueDate),now=new Date(),d0=new Date(now.getFullYear(),now.getMonth(),now.getDate()),st=new Date(s.last.date);
 const left=Math.round((end-d0)/864e5),tot=Math.max(1,Math.round((end-st)/864e5)),pct=Math.min(100,Math.max(0,Math.round((tot-left)/tot*100)));
@@ -229,7 +229,7 @@ function licDone(){const n=new Date(),x=fmt(new Date(n.getFullYear()+10,n.getMon
 S.veh.lic={exp:x,renewed:fmt(n)};save();render();const k=licLinks();try{window.open(k[0],"_blank","noopener")}catch(e){}}
 function licAct(){let h=`<button onclick="licDone()">Mark renewed</button>`;const k=licLinks();if(k)h+=`<div class="mu" style="margin-top:8px">✅ Renewed on ${S.veh.lic.renewed}. Add the new dates to Google Calendar (delete any older license events):</div>`+lk(k[0],"📅 Add new expiry ("+S.veh.lic.exp+")")+lk(k[1],"📅 Add 90-day renewal reminder");return h}
 function replCardOld(){const r=sched().rows.filter(x=>x.t==="R"&&x.st<2);if(!r.length)return"";const o=r.some(x=>x.st===0);
-return`<button class="al ${o?"ov":"wa"}" style="width:100%;text-align:left;border:0;display:block;cursor:pointer;font:inherit;font-weight:600" onclick="tab='sch';sf='R';render();scrollTo(0,0)"><div class="row sp"><span>🔔 ${r.length} item${r.length>1?"s":""} to replace</span><span>View ›</span></div><div style="font-weight:400;font-size:13px;margin-top:4px">${r.slice(0,4).map(x=>x.name).join(", ")}${r.length>4?" +"+(r.length-4)+" more":""}</div></button>`}
+return`<button class="al ${o?"ov":"wa"}" style="width:100%;text-align:left;border:0;display:block;cursor:pointer;font:inherit;font-weight:600" onclick="tab='sch';sf='R';render();$('#sc').scrollTo(0,0)"><div class="row sp"><span>🔔 ${r.length} item${r.length>1?"s":""} to replace</span><span>View ›</span></div><div style="font-weight:400;font-size:13px;margin-top:4px">${r.slice(0,4).map(x=>x.name).join(", ")}${r.length>4?" +"+(r.length-4)+" more":""}</div></button>`}
 function dueCard(){const rows=sched().rows,a=rows.filter(r=>r.st===0).length,b=rows.filter(r=>r.st===1).length;return a||b?`<div class="al ${a?"ov":"wa"}" onclick="tab='sch';render()">${a?a+" overdue, ":""}${b} item${b===1?"":"s"} due by next PMS - tap to view</div>`:""}
 function schedView(){if(!S.insp.length)return'<div class="card mu">Add your first PMS record in the PMS Log tab to see the maintenance schedule.</div>';const{s,rows}=sched(),cd=S.veh.cond||"n",R=rows.filter(r=>sf==="all"||(sf==="due"&&r.st<2)||(sf==="R"&&r.t==="R")||(sf==="I"&&r.t==="I"));
 const row=r=>`<div class="it"><div class="row sp"><span>${r.name}</span><span class="badge ${r.t==="R"?"wa":"ok"}">${r.t==="R"?"Replace":"Inspect"}</span></div><div class="mu">at ${r.c.toLocaleString()} km (${r.c-s.o>0?(r.c-s.o).toLocaleString()+" km left":"overdue"})${r.dt?" · or by "+r.dt:""} · ${r.rf?"from service "+r.rf.date:"per schedule"}</div></div>`;
@@ -245,7 +245,7 @@ function applyS(s,o){const ins=rec("insp",s.iid);if(ins)setDO(ins,o);if(o.shop)s
 async function scan(col,id,f){if(!f)return;const sm=await getSample();if(!sm)return alert("Scan & auto-fill works when this page is opened inside Claude (it uses your Claude account).");if(!confirm("Read this photo with Claude and fill the form? Fields it finds will replace what is there."))return;const m=$("#scan");if(m)m.textContent="Reading photo... this can take up to a minute.";
 try{const d=await shrink(f),r=rec(col,id),k=uid(),blob=await(await fetch(d)).blob();const o=await sm.json(col==="insp"?PI:PS(),{images:[blob],modelTier:"default",cache:false});await idb("put",k,d);r.imgs.push(k);col==="insp"?applyI(r,o):applyS(r,o);save();render();alert("Filled from the photo. Please review the values - handwriting can be misread.")}catch(e){const m2=$("#scan");if(m2)m2.textContent="Could not read the photo ("+(e&&e.code||"error")+"). You can still fill it in by hand."}}
 const T=[["dash","🏠","Home"],["pms","📋","PMS Log"],["sch","📅","Schedule"],["files","🖼️","Files"],["set","⚙️","Settings"]];
-function render(){$("#nav").innerHTML=T.map(t=>`<button class="${tab===t[0]?"on":""}" onclick="tab='${t[0]}';render();scrollTo(0,0)"><span>${t[1]}</span>${t[2]}</button>`).join("");
+function render(){$("#nav").innerHTML=T.map(t=>`<button class="${tab===t[0]?"on":""}" onclick="tab='${t[0]}';render();$('#sc').scrollTo(0,0)"><span>${t[1]}</span>${t[2]}</button>`).join("");
 $("#hd").textContent=S.veh.plate;$("#app").innerHTML={dash,pms:pmsView,sch:schedView,files,set:settings}[tab]();hydrate()}
 render();
 try{if("Notification"in window&&Notification.permission==="granted"){const a=status().al.filter(x=>x[0]==="ov");if(a.length)new Notification("PMS Tracker",{body:a[0][1]})}}catch(e){}
