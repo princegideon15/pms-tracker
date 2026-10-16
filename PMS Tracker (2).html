@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PMS Tracker</title>
+<style>
+:root{--bg:#f4f5f7;--card:#fff;--tx:#1a1d21;--mu:#6b7280;--bd:#e3e6ea;--ac:#0f766e;--g:#16a34a;--a:#f59e0b;--r:#dc2626;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111418;--card:#1b2026;--tx:#eceff2;--mu:#9aa3ad;--bd:#2c333b;--ac:#2dd4bf;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#111418;--card:#1b2026;--tx:#eceff2;--mu:#9aa3ad;--bd:#2c333b;--ac:#2dd4bf;color-scheme:dark}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding-bottom:76px}
+main{max-width:760px;margin:0 auto;padding:14px}
+h1{font-size:18px;margin:0}h2{font-size:15px;margin:18px 0 8px;color:var(--mu);text-transform:uppercase;letter-spacing:.04em}
+.top{display:flex;justify-content:space-between;align-items:center;padding:4px 0 10px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.sp{justify-content:space-between}
+.mu{color:var(--mu);font-size:13px}.big{font-size:28px;font-weight:700}
+input,select,textarea{width:100%;padding:10px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx);font:inherit}
+label{display:block;font-size:12px;color:var(--mu);margin:8px 0 3px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+button{font:inherit;border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:9px 13px;border-radius:10px;cursor:pointer}
+button.p{background:var(--ac);color:#fff;border-color:var(--ac)}button.d{color:var(--r)}
+.badge{display:inline-block;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:600;color:#fff}
+.ok{background:var(--g)}.wa{background:var(--a)}.ov{background:var(--r)}
+.al{padding:10px 12px;border-radius:10px;margin-bottom:8px;color:#fff;font-weight:500}
+.it{padding:9px 0;border-bottom:1px solid var(--bd)}.it:last-child{border:0}
+.st{display:flex;gap:5px}.st button{width:34px;height:34px;padding:0;border-radius:50%;opacity:.35;border-width:2px}
+.st button.on{opacity:1;color:#fff}.st .g{border-color:var(--g)}.st .g.on{background:var(--g)}.st .a{border-color:var(--a)}.st .a.on{background:var(--a)}.st .r{border-color:var(--r)}.st .r.on{background:var(--r)}
+.it input.n{margin-top:6px;padding:6px 9px;font-size:13px}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--bd);display:flex;padding-bottom:env(safe-area-inset-bottom,0px);z-index:5}
+nav button{flex:1;border:0;border-radius:0;background:none;padding:10px 2px;font-size:11px;color:var(--mu)}nav button.on{color:var(--ac);font-weight:700}nav span{display:block;font-size:19px}
+.th{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.th img{width:84px;height:84px;object-fit:cover;border-radius:10px;border:1px solid var(--bd);cursor:pointer}
+.th div{position:relative}.th b{position:absolute;top:2px;right:2px;background:#000a;color:#fff;border-radius:50%;width:20px;height:20px;text-align:center;font-size:12px;line-height:20px;cursor:pointer}
+#ov{position:fixed;inset:0;background:#000d;z-index:10;display:none;overflow:auto;padding:16px;text-align:center}#ov img{max-width:none;width:100%;max-width:1100px}#ov button{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));right:12px}
+.ln{display:grid;grid-template-columns:1fr 100px 34px;gap:6px;margin-bottom:6px}.ln button{padding:0}
+details{border:1px solid var(--bd);border-radius:10px;padding:8px 10px;margin-top:8px}summary{cursor:pointer;font-weight:600}
+.chip{display:inline-flex;align-items:center;gap:6px;margin:4px 8px 4px 0;font-size:13px}.chip input{width:auto}
+.sel{width:auto}
+</style></head><body>
+<main><div class="top"><h1>🚗 PMS Tracker</h1><span class="mu" id="hd"></span></div><div id="app"></div></main>
+<nav id="nav"></nav><div id="ov" onclick="this.style.display='none'"><button>Close ✕</button><img id="ovi"></div>
+<script>
+const $=s=>document.querySelector(s);
+const INSP=[["Initial checks",["Check Vehicle Service History","Check Vehicle Service Intervals","Check Timing Belt Replacement Interval","Check for Damage to Bodywork","Check Windscreen for damage","Check Light Covers","Check condition of Windscreen Wipers","Check Number Plates","Bounce all corners to check Shock Absorbers"]],
+["Interior checks",["Check Windscreen Washer Operation","Check Horn","Check Operation of Exterior Lights inc Brake Lights / Fog / Indicators / Hazards","Check Seat Belt Operation","Check Dashboard Lights inc ABS Warning"]],
+["Under bonnet checks",["Check Washer Level","Check Engine Oil Level","Check Brake Fluid Level & Conditions","Check Anti Freeze Protection","Check Battery Charge & terminals","Check Hoses Secure / Check for Leaks","Check Power Steering Operation","Check Power Steering Fluid Condition","Check Cooling System for Leaks, Cooling"]],
+["Vehicle raised checks",["Check for Oil Leaks","Check Brake Pipes / hoses for corrosion / leaks","Check Exhaust Condition","Check Shock Absorbers for Leaks & mounting bushes","Visually Check Steering & Suspension Bushes","Visually Check Fuel Lines","Visually Check Fuel Tank","Check Steering & Drive Shaft Gaiters"]],
+["Check & report on tyres",["Condition","Tread mm","Pressure & Air Top Up as required"]],
+["Wheels & brakes",["Check Wheels for damage","Rock Wheels to check for play & check for wheel bearing noise","Visual Check Front Brakes","Visual Check Rear Brakes","Check Handbrake Travel","Final Check"]]];
+const NAMES=[];INSP.forEach(g=>g[1].forEach(x=>NAMES.push(x)));
+const SVC={"Preventive maintenance":["Change oil","Replace oil filter","Replace air filter","Replace fuel filter","Replace sparkplug","Replace cabin filter","Replace transmission oil","Replace differential oil","Throttle body inspection","Inspect and clean brake lining and drum","Inspect / replace brake pads and disk","Inspect steering wheel, linkage and gear box","Inspect front and rear suspension","Inspect battery","Inspect clutch system","Inspect airconditioning","Inspect / replace drivebelt","Engine detailing","Fluid flushing"],
+"Major work":["EGR and intake manifold cleaning","Intake manifold cleaning","Radiator cleaning","Replace timing belt","Turbo cleaning","Replace turbo actuator","Replace tensioner bearing","Replace clutch kit","Valve clearance setting","Replace valve cover gasket","Throttle body cleaning","Top overhaul","Replace transmission"],
+"Underchassis":["Replace ball joint","Replace stabilizer link","Replace shock absorber","Replace tie rod","Replace rack end"],
+"Carwash":["Body carwash","Body wax","Exterior detailing","Interior detailing","Engine wash","Engine detailing","Under wash","Under coat"]};
+const uid=()=>Math.random().toString(36).slice(2,10);
+const peso=n=>"₱"+(+n||0).toLocaleString("en-PH",{minimumFractionDigits:2,maximumFractionDigits:2});
+const today=()=>new Date().toISOString().slice(0,10);
+let S,tab="dash",cur=null;
+function seed(){const items={};NAMES.forEach((_,i)=>items[i+1]={s:"g",n:""});items[3].s="a";items[3].n="Marked amber on sheet - verify interval";items[27]={s:"r",n:"Rear shock absorber - recommended replacement"};
+return{veh:{name:"Toyota Vios",year:2017,plate:"DAE 9479",intKm:5000,intMo:3,warnDays:14,v:2},
+insp:[{id:"i1",date:"2026-10-16",odo:116107,items,notes:"PMS 4L fully; brake cleaner; CVT fluid FE",reco:"Shock absorber rear",bv:"12.59",soc:"83",ty:["50","50","60","60"],imgs:[]}],
+svc:[{id:"s1",date:"2026-10-16",odo:116107,shop:"Kartrix Express - Pacita Branch",jo:"4568",paper:14488,paid:"Card",
+lines:[{d:"4L Petron Durafuel 5W-30 engine oil (PMS)",amt:4388},{d:"Brake cleaner",amt:300},{d:"Labor: pull down oil pan, replace trans filter & fluid",amt:2500},{d:"Part: transmission filter",amt:2550},{d:"5L CVTF (FE)",amt:4750}],
+checks:["Change oil","Replace transmission oil"],imgs:[]}]}}
+try{S=JSON.parse(localStorage.getItem("pms"))}catch(e){}
+if(!S||!S.veh)S=seed();
+if(S.veh.v!==2){Object.assign(S.veh,{intKm:5000,intMo:3,warnDays:14,v:2});delete S.veh.nextOdo;delete S.veh.warnKm;delete S.veh.odo;save()}
+S.svc.forEach(x=>{if(!x.iid){let i=S.insp.find(y=>y.date===x.date);if(!i){i=mkInsp(x.date,x.odo);S.insp.push(i)}x.iid=i.id}});S.insp.sort((a,b)=>b.date.localeCompare(a.date));save();
+function save(){try{localStorage.setItem("pms",JSON.stringify(S))}catch(e){alert("Storage full - export a backup.")}}
+// image store (IndexedDB)
+let db;const dbp=new Promise(r=>{try{const q=indexedDB.open("pmsimg",1);q.onupgradeneeded=()=>q.result.createObjectStore("i");q.onsuccess=()=>{db=q.result;r()};q.onerror=()=>r()}catch(e){r()}});
+const idb=(m,k,v)=>dbp.then(()=>new Promise(r=>{if(!db)return r(null);const t=db.transaction("i",m==="get"?"readonly":"readwrite").objectStore("i");const q=m==="get"?t.get(k):m==="put"?t.put(v,k):t.delete(k);q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)}));
+function shrink(f){return new Promise(r=>{const im=new Image(),u=URL.createObjectURL(f);im.onload=()=>{const s=Math.min(1,1600/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=im.width*s;c.height=im.height*s;c.getContext("2d").drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);r(c.toDataURL("image/jpeg",.8))};im.src=u})}
+async function addImgs(col,id,files){const rec=S[col].find(x=>x.id===id);for(const f of files){const k=uid();await idb("put",k,await shrink(f));rec.imgs.push(k)}save();render()}
+async function delImg(col,id,k){if(!confirm("Delete this image?"))return;const rec=S[col].find(x=>x.id===id);rec.imgs=rec.imgs.filter(x=>x!==k);await idb("del",k);save();render()}
+async function view(k){$("#ovi").src=await idb("get",k);$("#ov").style.display="block"}
+async function hydrate(){document.querySelectorAll("img[data-k]").forEach(async e=>{e.src=await idb("get",e.dataset.k)||""})}
+const thumbs=(col,id,imgs)=>`<div class="th">${imgs.map(k=>`<div><img data-k="${k}" onclick="view('${k}')"><b onclick="delImg('${col}','${id}','${k}')">×</b></div>`).join("")}</div><label class="chip" style="margin-top:8px"><button class="p" onclick="this.nextElementSibling.click()">📷 Upload paper image</button><input type="file" accept="image/*" multiple hidden onchange="addImgs('${col}','${id}',this.files)"></label>`;
+// helpers
+const rec=(c,id)=>S[c].find(x=>x.id===id);
+const up=(c,id,k,v)=>{const r=rec(c,id);r[k]=(k==="odo"||k==="paper")?(+v||0):v;if(c==="insp"&&(k==="date"||k==="odo"))S.svc.filter(x=>x.iid===id).forEach(x=>x[k]=r[k]);save();render()};
+const curOdo=()=>Math.max(0,...S.insp.map(x=>x.odo||0),...S.svc.map(x=>x.odo||0));
+const sum=s=>s.lines.reduce((a,l)=>a+(+l.amt||0),0);
+function status(){const v=S.veh,li=[...S.insp].sort((a,b)=>b.date.localeCompare(a.date))[0],ls=[...S.svc].sort((a,b)=>b.date.localeCompare(a.date))[0],last=li||ls;const o=last?last.odo:0,nextOdo=o+(+v.intKm||0);let days=null;if(last){const d=new Date(last.date);d.setMonth(d.getMonth()+(+v.intMo||0));days=Math.round((d-new Date())/864e5);var dueDate=d.toISOString().slice(0,10)}
+const al=[];
+if(days!==null){if(days<0)al.push(["ov",`PMS date passed ${-days} days ago`]);else if(days<=(+v.warnDays||14))al.push(["wa",`PMS due in ${days} days (${dueDate}) or at ${nextOdo.toLocaleString()} km, whichever comes first`])}
+if(li)Object.entries(li.items).forEach(([n,x])=>{if(x.s==="r")al.push(["ov",`#${n} ${NAMES[n-1]}: needs action${x.n?" - "+x.n:""}`]);else if(x.s==="a")al.push(["wa",`#${n} ${NAMES[n-1]}: monitor${x.n?" - "+x.n:""}`])});
+return{o,nextOdo,days,dueDate,last,svc:ls,al,li}}
+// views
+function dash(){const s=status(),v=S.veh,lvl=s.al.some(a=>a[0]==="ov")?"ov":s.al.length?"wa":"ok";
+return`<div class="card"><div class="row sp"><div><b>${v.name} ${v.year}</b><div class="mu">${v.plate}</div></div><span class="badge ${lvl}">${lvl==="ov"?"Action needed":lvl==="wa"?"Heads up":"All good"}</span></div>
+<div class="g2" style="margin-top:12px"><div><div class="mu">Odometer on PMS${s.last?" ("+s.last.date+")":""}</div><div class="big">${s.o.toLocaleString()}</div></div><div><div class="mu">Next PMS at</div><div class="big">${s.nextOdo.toLocaleString()}</div></div></div>
+<div class="mu" style="margin-top:6px">Due ${(+v.intKm).toLocaleString()} km or ${v.intMo} months after the PMS, whichever comes first${s.dueDate?" · by "+s.dueDate:""}</div>
+</div>
+${replCard()}<h2>Alerts</h2>${dueCard()}${s.al.length?s.al.map(a=>`<div class="al ${a[0]}">${a[1]}</div>`).join(""):'<div class="card mu">No alerts. Nice.</div>'}
+<button onclick="notif()">🔔 Enable device notifications</button>
+<h2>Last service</h2>${s.svc?`<div class="card"><b>${s.svc.shop}</b><div class="mu">${s.svc.date} · ${s.svc.odo.toLocaleString()} km · JO #${s.svc.jo}</div><div class="big" style="margin-top:6px">${peso(sum(s.svc))}</div></div>`:""}
+<div class="card"><div class="mu">Total spent (all logged services)</div><div class="big">${peso(S.svc.reduce((a,x)=>a+sum(x),0))}</div></div>`}
+function inspView(){if(!cur||!rec("insp",cur))cur=S.insp[0]?S.insp[0].id:null;const r=rec("insp",cur);
+const head=`<div class="row"><select class="sel" style="flex:1" onchange="cur=this.value;render()">${S.insp.map(x=>`<option value="${x.id}" ${x.id===cur?"selected":""}>${x.date} · ${x.odo.toLocaleString()} km</option>`).join("")}</select><button class="p" onclick="newInsp()">+ New PMS record</button></div>`;
+if(!r)return head+'<p class="mu">No inspections yet.</p>';
+let n=0;const f=(k,l,t="text")=>`<div><label>${l}</label><input type="${t}" value="${r[k]??""}" onchange="up('insp','${r.id}','${k}',this.value)"></div>`;
+const cnt={g:0,a:0,r:0};Object.values(r.items).forEach(x=>cnt[x.s]++);
+return head+`<div class="card" style="margin-top:12px"><div class="g2">${f("date","Date","date")}${f("odo","Mileage (km)","number")}</div><div class="row" style="margin-top:8px"><span class="badge ok">${cnt.g} OK</span><span class="badge wa">${cnt.a} Monitor</span><span class="badge ov">${cnt.r} Action</span></div></div>`+
+INSP.map(g=>`<h2>${g[0]}</h2><div class="card">${g[1].map(nm=>{n++;const it=r.items[n]||(r.items[n]={s:"g",n:""}),i=n;return`<div class="it"><div class="row sp"><span>${i}. ${nm}</span><div class="st">${["g","a","r"].map(c=>`<button class="${c} ${it.s===c?"on":""}" onclick="stt('${r.id}',${i},'${c}')">${c==="g"?"✓":c==="a"?"!":"✕"}</button>`).join("")}</div></div><input class="n" placeholder="Note / finding" value="${it.n.replace(/"/g,"&quot;")}" onchange="stn('${r.id}',${i},this.value)"></div>`}).join("")}</div>`).join("")+
+`<h2>Readings & report</h2><div class="card"><div class="g2">${f("bv","Battery (V)")}${f("soc","State of charge (%)")}</div><label>Tyres (OSF / NSF / OSR / NSR, as written)</label><div class="g4">${[0,1,2,3].map(i=>`<input value="${r.ty[i]}" onchange="S.insp.find(x=>x.id=='${r.id}').ty[${i}]=this.value;save()">`).join("")}</div>
+<label>Notes / report</label><textarea rows="2" onchange="up('insp','${r.id}','notes',this.value)">${r.notes}</textarea><label>Recommendation</label><textarea rows="2" onchange="up('insp','${r.id}','reco',this.value)">${r.reco}</textarea></div>
+<h2>Inspection paper</h2><div class="card">${thumbs("insp",r.id,r.imgs)}</div><button class="d" onclick="del('insp','${r.id}')">Delete this inspection</button>`}
+function stt(id,i,c){rec("insp",id).items[i].s=c;save();const y=scrollY;render();scrollTo(0,y)}
+function stn(id,i,v){rec("insp",id).items[i].n=v;save()}
+function newInsp(){const r=mkInsp(today(),curOdo());S.insp.unshift(r);S.svc.unshift(mkSvc(r));cur=r.id;save();render()}
+function mkInsp(d,o){const items={};NAMES.forEach((_,i)=>items[i+1]={s:"g",n:""});return{id:uid(),date:d,odo:o,items,notes:"",reco:"",bv:"",soc:"",ty:["","","",""],imgs:[]}}
+function mkSvc(r){return{id:uid(),iid:r.id,date:r.date,odo:r.odo,shop:"",jo:"",paper:0,paid:"",lines:[{d:"",amt:0}],checks:[],imgs:[]}}
+function pairSvc(id){S.svc.unshift(mkSvc(rec("insp",id)));save();render()}
+let pv="insp";
+function pmsView(){const seg=`<div class="row" style="margin-bottom:10px">${[["insp","📋 Inspection"],["svc","🧾 Service & receipt"]].map(([k,l])=>`<button class="${pv===k?"p":""}" style="flex:1" onclick="pv='${k}';render()">${l}</button>`).join("")}</div>`;
+if(pv==="insp")return seg+inspView();
+const r=rec("insp",cur)||S.insp[0];if(r)cur=r.id;const sv=r?S.svc.filter(x=>x.iid===r.id):[];
+return seg+`<div class="row"><select class="sel" style="flex:1" onchange="cur=this.value;render()">${S.insp.map(x=>`<option value="${x.id}" ${x.id===cur?"selected":""}>${x.date} · ${x.odo.toLocaleString()} km</option>`).join("")}</select><button class="p" onclick="pv='insp';newInsp()">+ New</button></div>`+(r?`<div class="mu" style="margin:8px 0">Date and odometer come from the inspection.</div>`+(sv.length?svcCards(sv):`<button class="p" onclick="pairSvc('${r.id}')">+ Add service / receipt</button>`):"")}
+function svcCards(L){return L.map(s=>{const t=sum(s),m=s.paper&&s.paper!==t;
+const f=(k,l,t2="text")=>`<div><label>${l}</label><input type="${t2}" value="${s[k]??""}" onchange="up('svc','${s.id}','${k}',this.value)"></div>`;
+return`<div class="card" style="margin-top:12px"><div class="g2">${s.iid?"":f("date","Date","date")+f("odo","Odometer (km)","number")}${f("shop","Shop")}${f("jo","Job order #")}${f("paid","Paid via")}${f("paper","Total written on paper","number")}</div>
+<h2>Breakdown</h2>${s.lines.map((l,i)=>`<div class="ln"><input value="${l.d.replace(/"/g,"&quot;")}" onchange="ln('${s.id}',${i},'d',this.value)"><input type="number" inputmode="decimal" value="${l.amt}" onchange="ln('${s.id}',${i},'amt',this.value)"><button class="d" onclick="rl('${s.id}',${i})">×</button></div>`).join("")}
+<button onclick="rec('svc','${s.id}').lines.push({d:'',amt:0});save();render()">+ Add line</button>
+<div class="row sp" style="margin-top:10px"><b>Computed total</b><span class="big">${peso(t)}</span></div>${m?`<div class="al wa" style="margin-top:8px">Paper says ${peso(s.paper)} - differs by ${peso(Math.abs(s.paper-t))}. Check amounts.</div>`:s.paper?'<div class="mu">✓ Matches the total on paper</div>':""}
+<details><summary>Services done (<span id="sc-${s.id}">${s.checks.length}</span>)</summary>${Object.entries(SVC).map(([g,a])=>`<div class="mu" style="margin-top:8px">${g}</div>${a.map(x=>`<label class="chip"><input type="checkbox" ${s.checks.includes(x)?"checked":""} onchange="ck('${s.id}',this.dataset.x,this.checked)" data-x="${x}">${x}</label>`).join("")}`).join("")}</details>
+<h2>Job order image</h2>${thumbs("svc",s.id,s.imgs)}<div style="margin-top:12px"><button class="d" onclick="del('svc','${s.id}')">Delete</button></div></div>`}).join("")}
+function ln(id,i,k,v){rec("svc",id).lines[i][k]=k==="amt"?(+v||0):v;save();render()}
+function rl(id,i){rec("svc",id).lines.splice(i,1);save();render()}
+function ck(id,x,on){const c=rec("svc",id).checks;if(on&&!c.includes(x))c.push(x);if(!on)c.splice(c.indexOf(x),1);save();const e=$("#sc-"+id);if(e)e.textContent=c.length}
+function newSvc(){S.svc.unshift({id:uid(),date:today(),odo:curOdo(),shop:"",jo:"",paper:0,paid:"",lines:[{d:"",amt:0}],checks:[],imgs:[]});save();render()}
+function del(c,id){if(!confirm("Delete this record and its images?"))return;const r=rec(c,id);r.imgs.forEach(k=>idb("del",k));S[c]=S[c].filter(x=>x.id!==id);if(c==="insp"){S.svc.filter(x=>x.iid===id).forEach(x=>x.imgs.forEach(k=>idb("del",k)));S.svc=S.svc.filter(x=>x.iid!==id)}save();render()}
+function files(){const a=[];S.insp.forEach(r=>r.imgs.forEach(k=>a.push([k,"Inspection "+r.date])));S.svc.forEach(r=>r.imgs.forEach(k=>a.push([k,"Job order "+r.date])));
+return a.length?`<div class="th">${a.map(([k,l])=>`<div><img data-k="${k}" onclick="view('${k}')"><div class="mu" style="font-size:11px;width:84px">${l}</div></div>`).join("")}</div>`:'<div class="card mu">No images yet. Upload the paper from the Inspection or Services tab.</div>'}
+function settings(){const v=S.veh,f=(k,l,t="text")=>`<div><label>${l}</label><input type="${t}" value="${v[k]}" onchange="S.veh.${k}=this.type=='number'?+this.value:this.value;save();render()"></div>`;
+return`<div class="card"><div class="g2">${f("name","Vehicle")}${f("year","Year","number")}${f("plate","Plate")}${f("intKm","PMS interval (km)","number")}${f("intMo","PMS interval (months)","number")}${f("warnDays","Warn before (days)","number")}</div><p class="mu">Next PMS = odometer of your latest inspection + interval km, or interval months after its date, whichever comes first. Changes show on Home right away.</p></div>
+<div class="card"><div class="row"><button onclick="exp()">⬇ Export backup</button><button onclick="this.nextElementSibling.click()">⬆ Import</button><input type="file" accept=".json" hidden onchange="imp(this.files[0])"></div><p class="mu">Data stays in this browser. Export a backup now and then (images included).</p></div>`}
+async function exp(){const im={};for(const r of [...S.insp,...S.svc])for(const k of r.imgs)im[k]=await idb("get",k);const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify({S,im})],{type:"application/json"}));a.download="pms-backup-"+today()+".json";a.click()}
+async function imp(f){try{const d=JSON.parse(await f.text());for(const k in d.im)await idb("put",k,d.im[k]);S=d.S;save();render()}catch(e){alert("Invalid backup file")}}
+function notif(){if(!("Notification"in window))return alert("Not supported on this device/browser.");Notification.requestPermission().then(p=>{if(p==="granted"){const a=status().al;new Notification("PMS Tracker",{body:a.length?a[0][1]:"All good"})}})}
+let sf="all";
+const Io=(km,mo)=>[{t:"I",km,mo}],Ro=(km,mo)=>[{t:"R",km,mo}],O5=Ro(5e3,6);
+const SCH=[["belt","Drive belts",Io(2e4,24)],["oil","Engine oil",Ro(1e4,12)],["oilf","Engine oil filter",Ro(1e4,12)],["cool","Cooling & heater system",[{t:"I",km:4e4,mo:24,a:[8e4,2e4,12]}]],["cldt","Engine coolant",[{t:"I",km:4e4,mo:0},{t:"R",km:8e4,mo:0,st:16e4}]],["exh","Exhaust pipes & mountings",Io(2e4,12)],["plug","Spark plugs",Ro(1e5,0)],["bat","Battery",Io(1e4,12)],["fuelf","Fuel filter (incl. in fuel tank)",Ro(8e4,96)],["air","Air cleaner filter",[{t:"I",km:2e4,mo:24},{t:"R",km:4e4,mo:48}]],["fline","Fuel tank cap, lines & vapor control valve",[{t:"I",km:4e4,mo:24,a:[8e4,2e4,12]}]],["char","Charcoal canister",Io(4e4,24)],["bpd","Brake pedal & parking brake",Io(1e4,6)],["lin","Brake linings & drums",Io(2e4,12)],["pad","Brake pads & discs",Io(1e4,6)],["bfl","Brake fluid",[{t:"I",km:1e4,mo:6},{t:"R",km:4e4,mo:24}]],["clu","Clutch fluid",Io(1e4,6)],["bpi","Brake pipes & hoses",Io(2e4,12)],["str","Steering wheel, linkage & gear box",Io(2e4,12)],["dsb","Drive shaft boots",Io(2e4,24)],["bj","Suspension ball joint & dust cover",Io(2e4,12)],["cvt","CVT fluid (incl. front differential)",[{t:"I",km:4e4,mo:24},{t:"R",km:8e4,mo:48}]],["sus","Front & rear suspension",Io(2e4,12)],["tyr","Tires & inflation pressure",Io(1e4,6)],["lgt","Lights, horns, wipers & washers",Io(1e4,6)],["acf","Air conditioning filter",Ro(3e4,0)],["ref","A/C refrigerant amount",Io(2e4,12)],["bolt","Tighten bolts & nuts (chassis & body)",[]]];
+const CONDS={n:["Normal",{}],b4:["Stop-and-go / long idling (B-4)",{oil:O5,oilf:O5,lin:Io(1e4,6),pad:Io(5e3,3)}],b3:["Short trips under 15 km (B-3)",{oil:O5,oilf:O5}],a1:["Rough / muddy roads (A-1)",{lin:Io(1e4,6),pad:Io(5e3,3),bpi:Io(1e4,6),str:Io(5e3,3),dsb:Io(1e4,12),bj:Io(1e4,6),sus:Io(1e4,6),bolt:Io(1e4,6)}],a2:["Dusty roads (A-2)",{oil:O5,oilf:O5,air:[{t:"I",km:2500,mo:3},{t:"R",km:4e4,mo:48}],lin:Io(1e4,6),pad:Io(5e3,3)}],b1:["Heavily loaded (B-1)",{oil:O5,oilf:O5,lin:Io(1e4,6),pad:Io(5e3,3),sus:Io(1e4,6),bolt:Io(1e4,6)}]};
+const MAP={"Change oil":["oil"],"Replace oil filter":["oilf"],"Replace air filter":["air"],"Replace fuel filter":["fuelf"],"Replace sparkplug":["plug"],"Replace cabin filter":["acf"],"Replace transmission oil":["cvt"],"Inspect and clean brake lining and drum":["lin"],"Inspect / replace brake pads and disk":["pad"],"Inspect steering wheel, linkage and gear box":["str"],"Inspect front and rear suspension":["sus"],"Inspect battery":["bat"],"Inspect clutch system":["clu"],"Inspect airconditioning":["ref"],"Inspect / replace drivebelt":["belt"],"Replace ball joint":["bj"],"Replace shock absorber":["sus"]};
+const addM=(d,m)=>{const x=new Date(d);x.setMonth(x.getMonth()+m);return x.toISOString().slice(0,10)};
+function ms(op,f){let c=Math.floor(f/op.km+1)*op.km;if(op.a&&c>op.a[0])c=f>=op.a[0]?op.a[0]+Math.floor((f-op.a[0])/op.a[1]+1)*op.a[1]:op.a[0]+op.a[1];if(op.st&&c<op.st)c=op.st;return c}
+function sched(){const s=status(),pO=s.o,pD=s.last?s.last.date:today(),cd=(CONDS[S.veh.cond||"n"]||CONDS.n)[1],rows=[],sv=[...S.svc].sort((a,b)=>b.date.localeCompare(a.date));
+const done=(id,r)=>sv.find(x=>x.checks.some(c=>(MAP[c]||[]).includes(id)&&(!r||/^(Replace|Change)/.test(c))));
+SCH.forEach(([id,name,ops])=>(cd[id]||ops).forEach(op=>{const rf=done(id,op.t==="R"),b=rf?rf.odo:null,a=op.a&&b!==null&&b>=op.a[0],km=a?op.a[1]:op.km,mo=a?op.a[2]:op.mo;let c=b!==null?b+km:ms(op,pO);if(op.st&&c<op.st)c=op.st;
+const dt=mo?addM(rf?rf.date:pD,mo):null,st=(c<=pO||(dt&&dt<=today()))?0:(c<=s.nextOdo||(dt&&dt<=(s.dueDate||"9999")))?1:2;rows.push({name,t:op.t,c,dt,st,rf})}));
+return{s,rows:rows.filter(x=>!(x.t==="I"&&rows.some(y=>y.name===x.name&&y.t==="R"&&y.c<=x.c))).sort((a,b)=>a.st-b.st||a.c-b.c)}}
+function replCard(){const r=sched().rows.filter(x=>x.t==="R"&&x.st<2);if(!r.length)return"";const o=r.some(x=>x.st===0);
+return`<button class="al ${o?"ov":"wa"}" style="width:100%;text-align:left;border:0;display:block;cursor:pointer;font:inherit;font-weight:600" onclick="tab='sch';sf='R';render();scrollTo(0,0)"><div class="row sp"><span>🔔 ${r.length} item${r.length>1?"s":""} to replace</span><span>View ›</span></div><div style="font-weight:400;font-size:13px;margin-top:4px">${r.slice(0,4).map(x=>x.name).join(", ")}${r.length>4?" +"+(r.length-4)+" more":""}</div></button>`}
+function dueCard(){const rows=sched().rows,a=rows.filter(r=>r.st===0).length,b=rows.filter(r=>r.st===1).length;return a||b?`<div class="al ${a?"ov":"wa"}" onclick="tab='sch';render()">${a?a+" overdue, ":""}${b} item${b===1?"":"s"} due by next PMS - tap to view</div>`:""}
+function schedView(){const{s,rows}=sched(),cd=S.veh.cond||"n",R=rows.filter(r=>sf==="all"||(sf==="due"&&r.st<2)||(sf==="R"&&r.t==="R")||(sf==="I"&&r.t==="I"));
+const row=r=>`<div class="it"><div class="row sp"><span>${r.name}</span><span class="badge ${r.t==="R"?"wa":"ok"}">${r.t==="R"?"Replace":"Inspect"}</span></div><div class="mu">at ${r.c.toLocaleString()} km (${r.c-s.o>0?(r.c-s.o).toLocaleString()+" km left":"overdue"})${r.dt?" · or by "+r.dt:""} · ${r.rf?"from service "+r.rf.date:"per schedule"}</div></div>`;
+const sec=(t,n)=>{const a=R.filter(r=>r.st===n);return a.length?`<h2>${t} (${a.length})</h2><div class="card">${a.map(row).join("")}</div>`:""};
+return`<div class="card"><div class="mu">Last PMS</div><b>${s.o.toLocaleString()} km${s.last?" · "+s.last.date:""}</b><div class="mu" style="margin-top:4px">Next PMS: ${s.nextOdo.toLocaleString()} km${s.dueDate?" or "+s.dueDate:""}</div><label>Driving condition</label><select onchange="S.veh.cond=this.value;save();render()">${Object.entries(CONDS).map(([k,v])=>`<option value="${k}" ${k===cd?"selected":""}>${v[0]}</option>`).join("")}</select><div class="row" style="margin-top:10px">${[["all","All"],["due","Due"],["R","Replace"],["I","Inspect"]].map(([k,l])=>`<button class="${sf===k?"p":""}" onclick="sf='${k}';render()">${l}</button>`).join("")}</div></div>`+sec("Overdue",0)+sec("Due by next PMS",1)+sec("Later",2)+`<p class="mu">From the Toyota maintenance schedule (pp. 298-303). Items you tick on the Services tab are counted from that service; the rest follow the manual's milestones after the last PMS odometer. Engine coolant: first replacement at 160,000 km, then every 80,000 km. After 80,000 km, cooling and fuel-line inspections move to every 20,000 km / 12 months.</p>`}
+const T=[["dash","🏠","Home"],["pms","📋","PMS Log"],["sch","📅","Schedule"],["files","🖼️","Files"],["set","⚙️","Settings"]];
+function render(){$("#nav").innerHTML=T.map(t=>`<button class="${tab===t[0]?"on":""}" onclick="tab='${t[0]}';render();scrollTo(0,0)"><span>${t[1]}</span>${t[2]}</button>`).join("");
+$("#hd").textContent=S.veh.plate;$("#app").innerHTML={dash,pms:pmsView,sch:schedView,files,set:settings}[tab]();hydrate()}
+render();
+try{if("Notification"in window&&Notification.permission==="granted"){const a=status().al.filter(x=>x[0]==="ov");if(a.length)new Notification("PMS Tracker",{body:a[0][1]})}}catch(e){}
+</script></body></html>
