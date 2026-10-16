@@ -58,14 +58,15 @@ const peso=n=>"₱"+(+n||0).toLocaleString("en-PH",{minimumFractionDigits:2,maxi
 const today=()=>new Date().toISOString().slice(0,10);
 let S,tab="dash",cur=null;
 function seed(){const items={};NAMES.forEach((_,i)=>items[i+1]={s:"g",n:""});items[3].s="a";items[3].n="Marked amber on sheet - verify interval";items[27]={s:"r",n:"Rear shock absorber - recommended replacement"};
-return{veh:{name:"Toyota Vios",year:2017,plate:"DAE 9479",intKm:5000,intMo:3,warnDays:14,v:2},
+return{veh:{name:"Toyota Vios",year:2017,plate:"DAE 9479",intKm:5000,intMo:6,warnDays:14,v:2},
 insp:[{id:"i1",date:"2026-10-16",odo:116107,items,notes:"PMS 4L fully; brake cleaner; CVT fluid FE",reco:"Shock absorber rear",bv:"12.59",soc:"83",ty:["50","50","60","60"],imgs:[]}],
 svc:[{id:"s1",date:"2026-10-16",odo:116107,shop:"Kartrix Express - Pacita Branch",jo:"4568",paper:14488,paid:"Card",
 lines:[{d:"4L Petron Durafuel 5W-30 engine oil (PMS)",amt:4388},{d:"Brake cleaner",amt:300},{d:"Labor: pull down oil pan, replace trans filter & fluid",amt:2500},{d:"Part: transmission filter",amt:2550},{d:"5L CVTF (FE)",amt:4750}],
 checks:["Change oil","Replace transmission oil"],imgs:[]}]}}
 try{S=JSON.parse(localStorage.getItem("pms"))}catch(e){}
 if(!S||!S.veh)S={veh:seed().veh,insp:[],svc:[]};
-if(S.veh.v!==2){Object.assign(S.veh,{intKm:5000,intMo:3,warnDays:14,v:2});delete S.veh.nextOdo;delete S.veh.warnKm;delete S.veh.odo;save()}
+if(S.veh.v!==2){Object.assign(S.veh,{intKm:5000,intMo:6,warnDays:14,v:2});delete S.veh.nextOdo;delete S.veh.warnKm;delete S.veh.odo;save()}
+if(!S.veh.m6){S.veh.intMo=6;S.veh.m6=1;save()}
 if(!S.veh.clean){S.insp=S.insp.filter(x=>x.id!=="i1");S.svc=S.svc.filter(x=>x.id!=="s1");S.veh.clean=1}
 S.svc.forEach(x=>{if(!x.iid){let i=S.insp.find(y=>y.date===x.date);if(!i){i=mkInsp(x.date,x.odo);S.insp.push(i)}x.iid=i.id}});S.insp.sort((a,b)=>b.date.localeCompare(a.date));save();
 function save(){try{localStorage.setItem("pms",JSON.stringify(S))}catch(e){alert("Storage full - export a backup.")}}
